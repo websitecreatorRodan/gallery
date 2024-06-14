@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Gallery</title>
+    <title>Rodan's Professional Gallery</title>
     <style>
-        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f3f3f3;
+            background: linear-gradient(to right, #e0eafc, #cfdef3); /* Smooth gradient background */
             color: #333;
         }
 
@@ -24,11 +21,14 @@
         .heading {
             text-align: center;
             margin-bottom: 40px;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #0288D1, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .heading h1 {
             font-size: 36px;
-            color: #007bff;
             margin: 0;
             padding: 10px 0;
         }
@@ -47,58 +47,164 @@
             max-width: calc(33.33% - 20px);
             overflow: hidden;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+        }
+
+        .gallery-box:hover {
+            transform: translateY(-5px);
         }
 
         .gallery-box img {
             width: 100%;
             height: auto;
-            object-fit: cover;
+            max-height: 100%; /* Ensure image does not exceed set height */
+            object-fit: cover; /* Cover the container while maintaining aspect ratio */
             border-radius: 10px;
-            transition: transform 0.3s; /* Added transition for zoom effect */
+            transition: transform 0.3s;
+            aspect-ratio: 9 / 16; /* Maintain 9:16 portrait aspect ratio */
         }
 
         /* Zoom effect on hover */
         .gallery-box:hover img {
-            transform: scale(1.1); /* Zoom in on hover */
+            transform: scale(1.05);
         }
 
         /* Download button styles */
         .download-btn {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(255, 255, 255, 0.7);
+            bottom: 15px;
+            right: 15px;
+            background: linear-gradient(to right, #0288D1, #ff6b6b);
             border: none;
             border-radius: 5px;
-            padding: 5px 10px;
+            padding: 10px 15px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
-            transition: background-color 0.3s;
+            transition: background 0.3s;
+            color: white;
             text-decoration: none;
-            color: black;
-            z-index: 1; /* Ensure button is above image */
+            z-index: 1;
         }
 
         .download-btn:hover {
+            background: linear-gradient(to right, #ff6b6b, #0288D1);
+        }
+
+        @media only screen and (max-width: 768px) {
+            .gallery-box {
+                flex: 0 0 calc(50% - 20px);
+                max-width: calc(50% - 20px);
+            }
+        }
+
+        @media only screen and (max-width: 480px) {
+            .gallery-box {
+                flex: 0 0 calc(100% - 20px);
+                max-width: calc(100% - 20px);
+            }
+
+            .heading h1 {
+                font-size: 28px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 80%;
+            max-height: 80%;
+            margin: auto;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            object-fit: cover; /* Cover the container while maintaining aspect ratio */
+            max-height: 80vh; /* Ensures the image fits within the viewport height */
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 40px;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        .close-btn:hover {
             background-color: rgba(255, 255, 255, 1);
+        }
+
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #0288D1;
+            color: white;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .footer a {
+            color: #ff6b6b;
+            text-decoration: none;
+            font-weight: bold;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="heading">
-            <h1>Welcome to <span style="color: #ff6b6b;">Rodan's</span> Professional Gallery</h1>
-        </div>
+            <h1 id="mainTitle"></h1>        </div>
         <div class="gallery" id="gallery">
             <!-- Images will be added dynamically using JavaScript -->
         </div>
     </div>
+    <div class="footer">
+        <p>&copy; 2023 Rodan's Gallery. All rights reserved. | Designed by <a href="#">Rodan</a></p>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <img src="" alt="Full Image" id="fullImage">
+        </div>
+    </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Array of image URLs
             var imageUrls = [
             "1.jpg",
@@ -127,50 +233,114 @@
             "30.jpg",
             "31.jpg",
             "32.jpg",
-            "33.jpg"
-            ];
+            "33.jpg",
+            "34.jpg", 
+            "35.jpg", 
+            "36.jpg", 
+            "37.jpg", 
+            "38.jpg", 
+            "39.jpg", 
+            "40.jpg", 
+            "41.jpg", 
+            "42.jpg", 
+            "43.jpg", 
+            "44.jpg", 
+            "45.jpg", 
+            "46.jpg", 
+            "47.jpg", 
+            "48.jpg", 
+            "49.jpg", 
+            "50.jpg"
+             ];
 
             // Get the gallery container
             var gallery = document.getElementById("gallery");
+            var modal = document.getElementById("modal");
+            var fullImage = document.getElementById("fullImage");
+            var closeBtn = document.getElementById("closeBtn");
 
-            // Loop through each image URL and create gallery box
-            imageUrls.forEach(function(imageUrl, index) {
-                // Create gallery box
+            // Add images to gallery
+            imageUrls.forEach(function (imageUrl, index) {
                 var galleryBox = document.createElement("div");
                 galleryBox.classList.add("gallery-box");
 
-                // Create link for modal
-                var modalLink = document.createElement("a");
-                modalLink.setAttribute("href", "#modal" + (index + 1));
-
-                // Create image element
                 var image = document.createElement("img");
                 image.setAttribute("src", imageUrl);
                 image.setAttribute("alt", "Image " + (index + 1));
+                image.addEventListener("click", function () {
+                    fullImage.setAttribute("src", imageUrl);
+                    fullImage.setAttribute("alt", "Full Image " + (index + 1));
+                    modal.style.display = "flex";
+                    setTimeout(function() {
+                        modal.style.opacity = "1";
+                    }, 0);  // Use a timeout to ensure the transition applies
+                });
 
-                // Create download button
                 var downloadBtn = document.createElement("button");
                 downloadBtn.classList.add("download-btn");
                 downloadBtn.textContent = "Download";
-                downloadBtn.addEventListener("click", function() {
-                    // Create a temporary anchor element
+                downloadBtn.addEventListener("click", function (event) {
+                    event.stopPropagation();
                     var tempAnchor = document.createElement("a");
                     tempAnchor.href = imageUrl;
                     tempAnchor.setAttribute("download", "");
                     tempAnchor.click();
                 });
 
-                // Append image and download button to modal link
-                modalLink.appendChild(image);
-                modalLink.appendChild(downloadBtn);
-
-                // Append modal link to gallery box
-                galleryBox.appendChild(modalLink);
-
-                // Append gallery box to gallery container
+                galleryBox.appendChild(image);
+                galleryBox.appendChild(downloadBtn);
                 gallery.appendChild(galleryBox);
             });
+
+            // Close modal
+            closeBtn.addEventListener("click", function () {
+                modal.style.opacity = "0";
+                setTimeout(function () {
+                    modal.style.display = "none";
+                }, 300);
+            });
+
+            // Close modal when clicking outside the modal content
+            modal.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    modal.style.opacity = "0";
+                    setTimeout(function () {
+                        modal.style.display = "none";
+                    }, 300);
+                }
+            });
         });
+
+
+
+
+        //for the txt changing pourpouses
+        const mainTitleText1 = "Rodan's Professional gallery ";
+        const mainTitleText2 = "A Place Where all Awsome Photos together";
+        let mainIndex = 0;
+        let currentTitle = mainTitleText1;
+
+        function typeMainTitle() {
+            if (mainIndex < currentTitle.length) {
+                document.getElementById('mainTitle').innerHTML += currentTitle.charAt(mainIndex);
+                mainIndex++;
+                setTimeout(typeMainTitle, 70); // Speed of typing
+            } else {
+                setTimeout(switchTitle, 3000); // Wait for 3 seconds before switching
+            }
+        }
+
+        function switchTitle() {
+            document.getElementById('mainTitle').innerHTML = ''; // Clear the current text
+            currentTitle = (currentTitle === mainTitleText1) ? mainTitleText2 : mainTitleText1;
+            mainIndex = 0; // Reset index
+            typeMainTitle(); // Restart typing with new title
+        }
+
+        window.onload = function() {
+            typeMainTitle(); // Start typing main title on load
+        };
     </script>
 </body>
+
 </html>
