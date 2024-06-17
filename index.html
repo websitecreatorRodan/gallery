@@ -20,7 +20,7 @@
         /* Heading Styles */
         .heading {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             font-family: 'Montserrat', sans-serif;
             background: linear-gradient(to right, #0288D1, #ff6b6b);
             -webkit-background-clip: text;
@@ -31,6 +31,27 @@
             font-size: 36px;
             margin: 0;
             padding: 10px 0;
+        }
+
+        /* Dropdown Styles */
+        .dropdown {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .dropdown select {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #0288D1;
+            border-radius: 5px;
+            background-color: #ffff;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .dropdown select:hover {
+            border-color: #ff6b6b;
         }
 
         /* Gallery Styles */
@@ -186,7 +207,17 @@
 <body>
     <div class="container">
         <div class="heading">
-            <h1 id="mainTitle"></h1>        </div>
+            <h1 id="mainTitle"></h1>
+        </div>
+        
+        <div class="dropdown">
+            <label for="sortOrder">Explore by: </label>
+            <select id="sortOrder">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                          </select>
+        </div>
+        
         <div class="gallery" id="gallery">
             <!-- Images will be added dynamically using JavaScript -->
         </div>
@@ -205,7 +236,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Array of image URLs
             var imageUrls = [
             "1.jpg",
             "3.jpg",
@@ -251,95 +281,61 @@
             "48.jpg", 
             "49.jpg", 
             "50.jpg"
-             ];
-
-            // Get the gallery container
-            var gallery = document.getElementById("gallery");
-            var modal = document.getElementById("modal");
-            var fullImage = document.getElementById("fullImage");
-            var closeBtn = document.getElementById("closeBtn");
-
-            // Add images to gallery
-            imageUrls.forEach(function (imageUrl, index) {
-                var galleryBox = document.createElement("div");
-                galleryBox.classList.add("gallery-box");
-
-                var image = document.createElement("img");
-                image.setAttribute("src", imageUrl);
-                image.setAttribute("alt", "Image " + (index + 1));
-                image.addEventListener("click", function () {
-                    fullImage.setAttribute("src", imageUrl);
-                    fullImage.setAttribute("alt", "Full Image " + (index + 1));
-                    modal.style.display = "flex";
-                    setTimeout(function() {
-                        modal.style.opacity = "1";
-                    }, 0);  // Use a timeout to ensure the transition applies
+            ];
+        
+            var mainTitle = "Rodan's Professional Gallery";
+            document.getElementById("mainTitle").textContent = mainTitle;
+        
+            var galleryContainer = document.getElementById("gallery");
+        
+            function createGallery(images) {
+                galleryContainer.innerHTML = ""; // Clear the previous content
+                images.forEach(function (url) {
+                    var imageBox = document.createElement("div");
+                    imageBox.className = "gallery-box";
+        
+                    var img = document.createElement("img");
+                    img.src = url;
+                    img.alt = "Gallery Image";
+                    img.addEventListener("click", function () {
+                        openModal(url);
+                    });
+        
+                    var downloadBtn = document.createElement("a");
+                    downloadBtn.href = url;
+                    downloadBtn.download = "";
+                    downloadBtn.textContent = "Download";
+                    downloadBtn.className = "download-btn";
+        
+                    imageBox.appendChild(img);
+                    imageBox.appendChild(downloadBtn);
+                    galleryContainer.appendChild(imageBox);
                 });
-
-                var downloadBtn = document.createElement("button");
-                downloadBtn.classList.add("download-btn");
-                downloadBtn.textContent = "Download";
-                downloadBtn.addEventListener("click", function (event) {
-                    event.stopPropagation();
-                    var tempAnchor = document.createElement("a");
-                    tempAnchor.href = imageUrl;
-                    tempAnchor.setAttribute("download", "");
-                    tempAnchor.click();
-                });
-
-                galleryBox.appendChild(image);
-                galleryBox.appendChild(downloadBtn);
-                gallery.appendChild(galleryBox);
-            });
-
-            // Close modal
-            closeBtn.addEventListener("click", function () {
-                modal.style.opacity = "0";
-                setTimeout(function () {
-                    modal.style.display = "none";
-                }, 300);
-            });
-
-            // Close modal when clicking outside the modal content
-            modal.addEventListener("click", function (event) {
-                if (event.target === modal) {
-                    modal.style.opacity = "0";
-                    setTimeout(function () {
-                        modal.style.display = "none";
-                    }, 300);
-                }
-            });
-        });
-
-
-
-
-        //for the txt changing pourpouses
-        const mainTitleText1 = "Rodan's Professional gallery ";
-        const mainTitleText2 = "A Place Where all Awsome Photos together";
-        let mainIndex = 0;
-        let currentTitle = mainTitleText1;
-
-        function typeMainTitle() {
-            if (mainIndex < currentTitle.length) {
-                document.getElementById('mainTitle').innerHTML += currentTitle.charAt(mainIndex);
-                mainIndex++;
-                setTimeout(typeMainTitle, 70); // Speed of typing
-            } else {
-                setTimeout(switchTitle, 3000); // Wait for 3 seconds before switching
             }
-        }
-
-        function switchTitle() {
-            document.getElementById('mainTitle').innerHTML = ''; // Clear the current text
-            currentTitle = (currentTitle === mainTitleText1) ? mainTitleText2 : mainTitleText1;
-            mainIndex = 0; // Reset index
-            typeMainTitle(); // Restart typing with new title
-        }
-
-        window.onload = function() {
-            typeMainTitle(); // Start typing main title on load
-        };
+        
+            function openModal(imageSrc) {
+                var modal = document.getElementById("modal");
+                var fullImage = document.getElementById("fullImage");
+        
+                fullImage.src = imageSrc;
+                modal.style.display = "flex";
+            }
+        
+            document.getElementById("closeBtn").addEventListener("click", function () {
+                document.getElementById("modal").style.display = "none";
+            });
+        
+            document.getElementById("sortOrder").addEventListener("change", function (e) {
+                var sortedImages = [...imageUrls];
+                if (e.target.value === "newest") {
+                    sortedImages.reverse();
+                }
+                createGallery(sortedImages);
+            });
+        
+            // Initialize the gallery with the default sort order (newest)
+            createGallery([...imageUrls].reverse());
+        });
     </script>
 </body>
 
