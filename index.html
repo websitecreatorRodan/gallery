@@ -1,98 +1,297 @@
+
 <!DOCTYPE html>  
 <html lang="en">  
 <head>  
     <meta charset="UTF-8">  
+    <title>Terrifying Pumpkin Loading Screen</title>  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Enhanced Colorful 3D Cube Loading Screen</title>  
+    <!-- Three.js Library -->  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>  
+    <!-- Tailwind CSS -->  
+    <script src="https://cdn.tailwindcss.com"></script>  
     <style>  
-        body, html {  
-            margin: 0;  
-            padding: 0;  
-            height: 100%;  
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');  
+        body { font-family: 'Creepster', cursive; overflow: hidden; }  
+        .blood-drip {  
+            position: absolute;  
+            width: 10px;  
+            background-color: #8B0000;  
+            animation: drip 3s infinite;  
+        }  
+        @keyframes drip {  
+            0% { height: 0; top: -10%; opacity: 1; }  
+            90% { height: 100px; top: 110%; opacity: 1; }  
+            100% { height: 100px; top: 110%; opacity: 0; }  
+        }  
+        #clickAnimation {  
+            position: absolute;  
+            top: 20px;  
+            right: 20px;  
+            width: 60px;  
+            height: 60px;  
+            background-color: rgba(139, 0, 0, 0.7);  
+            border-radius: 50%;  
             display: flex;  
             align-items: center;  
             justify-content: center;  
-            background: linear-gradient(135deg, #1a1a2e, #16213e);  
-            overflow: hidden;  
-        }  
-        .scene {  
-            perspective: 600px;  
-        }  
-        .cube {  
-            width: 900px;  
-            height: 900px;  
-            position: relative;  
-            transform-style: preserve-3d;  
-            animation: rotate 4s infinite linear;  
-        }  
-        .cube div {  
-            position: absolute;  
-            width: 100px;  
-            height: 100px;  
-            opacity: 0.8;  
-            border: 2px solid rgba(255, 255, 255, 0.1);  
-            display: flex;  
-            align-items: center;  
-            justify-content: center;  
-            font-family: Arial, sans-serif;  
-            font-size: 20px;  
-            color: rgba(255, 255, 255, 0.8);  
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);  
-        }  
-        .front  { transform: translateZ(50px); background-color: rgba(255, 111, 97, 0.7); }  
-        .back   { transform: rotateY(180deg) translateZ(50px); background-color: rgba(107, 91, 149, 0.7); }  
-        .right  { transform: rotateY(90deg) translateZ(50px); background-color: rgba(136, 176, 75, 0.7); }  
-        .left   { transform: rotateY(-90deg) translateZ(50px); background-color: rgba(247, 202, 201, 0.7); }  
-        .top    { transform: rotateX(90deg) translateZ(50px); background-color: rgba(146, 168, 209, 0.7); }  
-        .bottom { transform: rotateX(-90deg) translateZ(50px); background-color: rgba(255, 204, 92, 0.7); }  
-
-        @keyframes rotate {  
-            0% { transform: rotateX(0deg) rotateY(0deg); }  
-            100% { transform: rotateX(360deg) rotateY(360deg); }  
-        }  
-        .loading-text {  
-            position: absolute;  
-            bottom: 20px;  
-            font-family: Arial, sans-serif;  
-            font-size: 18px;  
+            font-size: 30px;  
             color: white;  
-            text-align: center;  
-        }  
-        .glow {  
-            position: absolute;  
-            width: 150px;  
-            height: 150px;  
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);  
-            animation: pulse 2s infinite alternate;  
+            cursor: pointer;  
+            animation: pulse 1.5s infinite;  
         }  
         @keyframes pulse {  
-            from { transform: scale(1); opacity: 0.5; }  
-            to { transform: scale(1.2); opacity: 0.8; }  
+            0% { transform: scale(1); }  
+            50% { transform: scale(1.3); }  
+            100% { transform: scale(1); }  
+        }  
+        #jumpScare {  
+            position: fixed;  
+            top: 0;  
+            left: 0;  
+            width: 100%;  
+            height: 100%;  
+            background-image: url('https://i.imgur.com/4Yv9dIp.jpg');  
+            background-size: cover;  
+            background-position: center;  
+            display: none;  
+            z-index: 1000;  
         }  
     </style>  
 </head>  
-<body>  
-    <div class="scene">  
-        <div class="glow"></div>  
-        <div class="cube">  
-            <div class="front">Front</div>  
-            <div class="back">Back</div>  
-            <div class="right">Right</div>  
-            <div class="left">Left</div>  
-            <div class="top">Top</div>  
-            <div class="bottom">Bottom</div>  
-        </div>  
+<body class="bg-black m-0 p-0 h-screen flex items-center justify-center">  
+    <div id="pumpkinScene" class="w-full h-full cursor-default"></div>  
+    <div id="loadingText" class="absolute bottom-5 text-5xl text-red-600 text-center animate-pulse"></div>  
+    <div id="clickAnimation">👆</div>  
+    <div id="jumpScare"></div>  
+
+    <!-- Audio Storage Section -->  
+    <div id="audioStorage" style="display: none;">  
+        <!-- Background Music -->  
+        <audio id="backgroundMusic" loop>  
+            <source src="path/to/your/background-music.mp3" type="audio/mpeg">  
+        </audio>  
+        <!-- Scream Sound -->  
+        <audio id="screamSound">  
+            <source src="path/to/your/scream-sound.mp3" type="audio/mpeg">  
+        </audio>  
+        <!-- Additional Audio Files -->  
+        <!-- Add more audio elements here as needed -->  
     </div>  
-    <div class="loading-text">Loading...</div>  
 
     <script>  
-        // Function to navigate to main page after delay  
-        function navigateToMainPage() {  
-            window.location.href = "main page.html";  
+        let scene, camera, renderer, pumpkin, smoke, mouth;  
+        let isClickable = false;  
+        
+        function init() {  
+            scene = new THREE.Scene();  
+            camera = new THREE.PerspectiveCamera(  
+                75,  
+                window.innerWidth / window.innerHeight,  
+                0.1,  
+                1000  
+            );  
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });  
+            renderer.setSize(window.innerWidth, window.innerHeight);  
+            document.getElementById('pumpkinScene').appendChild(renderer.domElement);  
+
+            const ambientLight = new THREE.AmbientLight(0x220000, 0.1);  
+            scene.add(ambientLight);  
+
+            const candleLight = new THREE.PointLight(0xff3300, 2, 50);  
+            candleLight.position.set(0, 0, 2);  
+            scene.add(candleLight);  
+
+            const pumpkinGeometry = new THREE.SphereGeometry(1, 32, 32);  
+            const pumpkinMaterial = new THREE.MeshPhongMaterial({  
+                color: 0x2a0000,  
+                specular: 0x111111,  
+                shininess: 50,  
+                emissive: 0x220000,  
+                emissiveIntensity: 0.7  
+            });  
+            pumpkin = new THREE.Mesh(pumpkinGeometry, pumpkinMaterial);  
+            scene.add(pumpkin);  
+
+            // Distort the pumpkin's shape more intensely  
+            const positions = pumpkinGeometry.attributes.position;  
+            for (let i = 0; i < positions.count; i++) {  
+                const x = positions.getX(i);  
+                const y = positions.getY(i);  
+                const z = positions.getZ(i);  
+                positions.setXYZ(  
+                    i,  
+                    x + (Math.random() - 0.5) * 0.5,  
+                    y + (Math.random() - 0.5) * 0.5,  
+                    z + (Math.random() - 0.5) * 0.5  
+                );  
+            }  
+            positions.needsUpdate = true;  
+
+            // Eyes with flickering effect  
+            const eyeGeometry = new THREE.SphereGeometry(0.15, 32, 32);  
+            const eyeMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0xff0000 });  
+            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);  
+            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);  
+            leftEye.position.set(-0.3, 0.3, 0.85);  
+            rightEye.position.set(0.3, 0.3, 0.85);  
+            pumpkin.add(leftEye);  
+            pumpkin.add(rightEye);  
+
+            // Mouth with jagged edges  
+            const mouthShape = new THREE.Shape();  
+            mouthShape.moveTo(-0.5, 0);  
+            mouthShape.lineTo(-0.4, -0.1);  
+            mouthShape.lineTo(-0.3, 0);  
+            mouthShape.lineTo(-0.2, -0.1);  
+            mouthShape.lineTo(-0.1, 0);  
+            mouthShape.lineTo(0, -0.1);  
+            mouthShape.lineTo(0.1, 0);  
+            mouthShape.lineTo(0.2, -0.1);  
+            mouthShape.lineTo(0.3, 0);  
+            mouthShape.lineTo(0.4, -0.1);  
+            mouthShape.lineTo(0.5, 0);  
+            mouthShape.lineTo(0.5, -0.3);  
+            mouthShape.lineTo(-0.5, -0.3);  
+            mouthShape.lineTo(-0.5, 0);  
+            const mouthGeometry = new THREE.ShapeGeometry(mouthShape);  
+            const mouthMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });  
+            mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);  
+            mouth.position.set(0, -0.2, 0.9);  
+            pumpkin.add(mouth);  
+
+            // Teeth with sharper appearance  
+            const teethGeometry = new THREE.ConeGeometry(0.05, 0.3, 32);  
+            const teethMaterial = new THREE.MeshPhongMaterial({ color: 0xffffcc });  
+            for (let i = 0; i < 16; i++) {  
+                const tooth = new THREE.Mesh(teethGeometry, teethMaterial);  
+                const angle = (i / 16) * Math.PI * 2;  
+                tooth.position.set(Math.cos(angle) * 0.4, Math.sin(angle) * 0.4 - 0.2, 0.95);  
+                tooth.rotation.z = angle + Math.PI / 2;  
+                pumpkin.add(tooth);  
+            }  
+
+            // Smoke with erratic movement  
+            const smokeGeometry = new THREE.BufferGeometry();  
+            const smokeVertices = [];  
+            for (let i = 0; i < 7000; i++) {  
+                const x = Math.random() * 10 - 5;  
+                const y = Math.random() * 10 - 5;  
+                const z = Math.random() * 10 - 5;  
+                smokeVertices.push(x, y, z);  
+            }  
+            smokeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(smokeVertices, 3));  
+            const smokeMaterial = new THREE.PointsMaterial({  
+                color: 0x111111,  
+                size: 0.15,  
+                transparent: true,  
+                opacity: 0.8  
+            });  
+            smoke = new THREE.Points(smokeGeometry, smokeMaterial);  
+            scene.add(smoke);  
+
+            camera.position.z = 3;  
+
+            animate();  
+            createBloodDrips();  
+
+            // Play background music  
+            const backgroundMusic = document.getElementById('backgroundMusic');  
+            backgroundMusic.volume = 0.5;  
+            backgroundMusic.play();  
         }  
 
-        // Set timeout to navigate after 3 seconds  
-        setTimeout(navigateToMainPage, 3000);  
+        function animate() {  
+            requestAnimationFrame(animate);  
+            if (pumpkin) {  
+                pumpkin.rotation.y += 0.02;  
+                pumpkin.rotation.x = Math.sin(Date.now() * 0.004) * 0.3;  
+                const flickerIntensity = 0.5 + 0.5 * Math.sin(Date.now() * 0.1);  
+                pumpkin.material.emissiveIntensity = flickerIntensity;  
+                pumpkin.children.forEach(child => {  
+                    if (child.material.emissive) {  
+                        child.material.emissiveIntensity = flickerIntensity;  
+                    }  
+                });  
+
+                // Mouth animation  
+                const laughScale = 0.6 + 0.4 * Math.abs(Math.sin(Date.now() * 0.03));  
+                mouth.scale.set(laughScale, laughScale, 1);  
+            }  
+            if (smoke) {  
+                smoke.rotation.y += 0.002;  
+                const positions = smoke.geometry.attributes.position.array;  
+                for (let i = 0; i < positions.length; i += 3) {  
+                    positions[i + 1] += 0.05 * (Math.random() - 0.5);  
+                    positions[i] += 0.05 * (Math.random() - 0.5);  
+                    if (positions[i + 1] > 5) positions[i + 1] = -5;  
+                }  
+                smoke.geometry.attributes.position.needsUpdate = true;  
+            }  
+            renderer.render(scene, camera);  
+        }  
+
+        function createBloodDrips() {  
+            for (let i = 0; i < 20; i++) {  
+                const drip = document.createElement('div');  
+                drip.className = 'blood-drip';  
+                drip.style.left = `${Math.random() * 100}%`;  
+                drip.style.animationDelay = `${Math.random() * 2}s`;  
+                drip.style.animationDuration = `${2 + Math.random() * 2}s`;  
+                document.body.appendChild(drip);  
+            }  
+        }  
+
+        function navigateToMainPage() {  
+            if (isClickable) {  
+                window.location.href = "main page.html";  
+            }  
+        }  
+
+        function triggerJumpScare() {  
+            const jumpScare = document.getElementById('jumpScare');  
+            const screamSound = document.getElementById('screamSound');  
+            jumpScare.style.display = 'block';  
+            screamSound.play();  
+            setTimeout(() => {  
+                jumpScare.style.display = 'none';  
+            }, 1000);  
+        }  
+
+        init();  
+
+        const loadingTexts = [  
+            "Summoning dark forces...",  
+            "Preparing your nightmare...",  
+            "Harvesting lost souls...",  
+            "Awakening ancient evils...",  
+            "Your doom approaches..."  
+        ];  
+
+        let textIndex = 0;  
+        function changeLoadingText() {  
+            const loadingText = document.getElementById('loadingText');  
+            loadingText.textContent = loadingTexts[textIndex];  
+            textIndex = (textIndex + 1) % loadingTexts.length;  
+            loadingText.style.fontSize = `${5 + Math.random() * 2}rem`;  
+            loadingText.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;  
+        }  
+
+        setInterval(changeLoadingText, 3000);  
+
+        setTimeout(() => {  
+            isClickable = true;  
+            document.getElementById('pumpkinScene').classList.add('cursor-pointer');  
+            document.getElementById('loadingText').textContent = 'Click to seal your fate!';  
+        }, 3000);  
+
+        document.getElementById('pumpkinScene').addEventListener('click', navigateToMainPage);  
+        document.getElementById('clickAnimation').addEventListener('click', triggerJumpScare);  
+
+        window.addEventListener('resize', function () {  
+            camera.aspect = window.innerWidth / window.innerHeight;  
+            camera.updateProjectionMatrix();  
+            renderer.setSize(window.innerWidth, window.innerHeight);  
+        });  
     </script>  
 </body>  
 </html>  
