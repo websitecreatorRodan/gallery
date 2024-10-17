@@ -1,0 +1,827 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Rodan's Haunted Nature Realm</title>  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <!-- Three.js Library -->  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>  
+    <!-- Tailwind CSS -->  
+    <script src="https://cdn.tailwindcss.com"></script>  
+    <style>  
+         @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Roboto:wght@400;700&display=swap');   
+
+        :root {   
+            --spooky-green: #4caf50;   
+            --dark-bg: #0a0a0a;   
+            --eerie-text: #b0b0b0;   
+        }   
+
+        body {   
+            background-color: var(--dark-bg);   
+            color: var(--eerie-text);   
+            font-family: 'Roboto', sans-serif;   
+            margin: 0;   
+            padding: 0;   
+            overflow: auto;  
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🦇</text></svg>") 16 0, auto;   
+        }   
+
+        .container {   
+            max-width: 1200px;   
+            margin: 0 auto;   
+            padding: 20px;   
+            background-color: rgba(10, 10, 10, 0.9);   
+            position: relative;   
+            overflow: hidden;   
+            z-index: 2;  
+        }   
+
+        /* Fog effect using Three.js canvas */  
+        #fogCanvas {  
+            position: fixed;  
+            top: 0;  
+            left: 0;  
+            width: 100%;  
+            height: 100%;  
+            z-index: 1;  
+            pointer-events: none;  
+        }  
+        .ghost {
+        position: absolute;
+        width: 50px; /* Adjust size as needed */
+        height: auto;
+        animation: moveGhost 10s linear infinite; /* Looping animation */
+        opacity: 0.8; /* Slight transparency */
+        pointer-events: none; /* Prevent interference with clicks */
+        z-index: -1; /* Move ghosts behind other elements */
+    }
+
+
+    @keyframes moveGhost {
+        0% { transform: translateX(100vw); opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { transform: translateX(-100vw); opacity: 1; }
+    }
+
+
+        /* Heading Styles */   
+        .heading {   
+            text-align: center;   
+            margin-bottom: 30px;   
+            position: relative;   
+            z-index: 3;   
+        }   
+
+        .heading h1 {   
+            font-family: 'Nosifer', cursive;   
+            font-size: 60px;   
+            color: var(--spooky-green);   
+            margin: 0;   
+            padding: 10px 0;   
+            text-shadow: 2px 2px 4px #000000, 0 0 20px var(--spooky-green), 0 0 30px var(--spooky-green);   
+            animation: pulsate 2s infinite alternate;   
+        }   
+
+        @keyframes pulsate {   
+            0% { text-shadow: 2px 2px 4px #000000, 0 0 20px var(--spooky-green), 0 0 30px var(--spooky-green); }   
+            100% { text-shadow: 2px 2px 4px #000000, 0 0 40px var(--spooky-green), 0 0 60px var(--spooky-green); }   
+        }   
+
+        /* Dropdown Styles */   
+        .dropdown {   
+            text-align: center;   
+            margin-bottom: 40px;   
+            position: relative;   
+            z-index: 3;   
+        }   
+
+        .dropdown select {   
+            padding: 10px 20px;   
+            font-size: 16px;   
+            border: 2px solid var(--spooky-green);   
+            border-radius: 5px;   
+            background-color: var(--dark-bg);   
+            color: var(--spooky-green);   
+            cursor: pointer;   
+            transition: all 0.3s;   
+            font-family: 'Creepster', cursive;   
+        }   
+
+        .dropdown select:hover {   
+            background-color: var(--spooky-green);   
+            color: var(--dark-bg);   
+            box-shadow: 0 0 10px var(--spooky-green);   
+        }   
+
+        /* Gallery Styles */   
+        .gallery {   
+            display: flex;   
+            flex-wrap: wrap;   
+            gap: 20px;   
+            justify-content: center;   
+            position: relative;   
+            z-index: 3;   
+        }   
+
+        .gallery-box {   
+            position: relative;   
+            flex: 0 0 calc(33.33% - 20px);   
+            max-width: calc(33.33% - 20px);   
+            overflow: hidden;   
+            border-radius: 10px;   
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);   
+            transition: transform 0.3s;   
+        }   
+
+        .gallery-box:hover {   
+            transform: scale(1.05);   
+            box-shadow: 0 0 20px var(--spooky-green);   
+        }   
+
+        .gallery-box img {   
+            width: 100%;   
+            height: auto;   
+            object-fit: cover;   
+            transition: filter 0.3s;   
+            aspect-ratio: 9 / 16;   
+        }   
+
+        .gallery-box:hover img {   
+            filter: brightness(0.7) contrast(1.2) hue-rotate(20deg) sepia(50%);   
+        }   
+
+        /* Download button styles */   
+        .download-btn {   
+            position: absolute;   
+            bottom: 15px;   
+            right: 15px;   
+            background-color: rgba(76, 175, 80, 0.7);   
+            border: none;   
+            border-radius: 5px;   
+            padding: 8px 12px;   
+            cursor: pointer;   
+            font-size: 14px;   
+            font-weight: bold;   
+            text-align: center;   
+            transition: all 0.3s;   
+            color: var(--dark-bg);   
+            text-decoration: none;   
+            font-family: 'Creepster', cursive;   
+        }   
+
+        .bar:hover {
+    background-color: #ff0000; /* Change color on hover */
+    box-shadow: 0 0 10px #ff0000; /* Red glow on hover */
+}
+
+        .download-btn:hover {   
+            background-color: var(--spooky-green);   
+            box-shadow: 0 0 10px var(--spooky-green);   
+            transform: scale(1.1);   
+        }   
+
+        /* Modal Styles */   
+        .modal {   
+            display: none;   
+            position: fixed;   
+            top: 0;   
+            left: 0;   
+            width: 100%;   
+            height: 100%;   
+            background-color: rgba(0, 0, 0, 0.9);   
+            justify-content: center;   
+            align-items: center;   
+            z-index: 9999;   
+        }   
+
+        .modal-content {   
+            position: relative;   
+            max-width: 80%;   
+            max-height: 80%;   
+            margin: auto;   
+            border: 3px solid var(--spooky-green);   
+            border-radius: 10px;   
+            overflow: hidden;   
+            box-shadow: 0 0 30px var(--spooky-green);   
+            animation: glow 2s infinite alternate;   
+        }   
+
+        @keyframes glow {   
+            0% { box-shadow: 0 0 30px var(--spooky-green); }   
+            100% { box-shadow: 0 0 50px var(--spooky-green), 0 0 80px var(--spooky-green); }   
+        }   
+
+        .modal-content img {   
+            width: 100%;   
+            height: auto;   
+            object-fit: contain;   
+            max-height: 80vh;   
+        }   
+
+        .close-btn {   
+            position: absolute;   
+            top: 10px;   
+            right: 10px;   
+            background-color: rgba(76, 175, 80, 0.7);   
+            border: none;   
+            border-radius: 50%;   
+            width: 40px;   
+            height: 40px;   
+            cursor: pointer;   
+            font-size: 24px;   
+            font-weight: bold;   
+            text-align: center;   
+            line-height: 40px;   
+            color: var(--dark-bg);   
+            transition: all 0.3s;   
+        }   
+
+        .close-btn:hover {   
+            background-color: var(--spooky-green);   
+            transform: rotate(180deg);   
+        }   
+
+        /* Footer Styles */   
+        .footer {   
+            text-align: center;   
+            padding: 20px;   
+            background-color: rgba(26, 26, 26, 0.8);   
+            color: var(--spooky-green);   
+            border-top: 2px solid var(--spooky-green);   
+            font-family: 'Creepster', cursive;   
+            position: relative;   
+            z-index: 3;   
+        }   
+
+        .footer a {   
+            color: #81c784;   
+            text-decoration: none;   
+            font-weight: bold;   
+        }   
+
+        /* Spooky Decorations */   
+        .decoration {   
+            position: fixed;   
+            font-size: 40px;   
+            animation: float 3s ease-in-out infinite;   
+            z-index: 1000;   
+            opacity: 0.7;   
+            transition: all 0.3s;   
+        }   
+
+        .decoration:hover {   
+            transform: scale(1.2);   
+            opacity: 1;   
+        }   
+
+        .tree { bottom: 20px; left: 20px; }   
+        .fog-emoji { top: 20px; right: 20px; }   
+        .moon { top: 50%; left: 20px; }   
+        .owl { bottom: 20px; right: 20px; }   
+
+        @keyframes float {   
+            0%, 100% { transform: translateY(0) rotate(0deg); }   
+            50% { transform: translateY(-20px) rotate(5deg); }   
+        }   
+
+        /* Responsive Design */   
+        @media only screen and (max-width: 768px) {   
+            .gallery-box {   
+                flex: 0 0 calc(50% - 20px);   
+                max-width: calc(50% - 20px);   
+            }   
+        }   
+
+        @media only screen and (max-width: 480px) {   
+            .gallery-box {   
+                flex: 0 0 calc(100% - 20px);   
+                max-width: calc(100% - 20px);   
+            }   
+
+            .heading h1 {   
+                font-size: 40px;   
+            }   
+        }   
+
+        .music-player {   
+            position: fixed;   
+            bottom: 20px;   
+            left: 50%;   
+            transform: translateX(-50%);   
+            background-color: rgba(10, 10, 10, 0.8);   
+            padding: 10px;   
+            border-radius: 10px;   
+            display: flex;   
+            align-items: center;   
+            z-index: 1000;   
+            display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(10, 10, 10, 0.8);
+    border-radius: 10px;
+        }   
+
+        .music-player button {   
+            background-color: var(--spooky-green);   
+            color: var(--dark-bg);   
+            border: none;   
+            padding: 5px 10px;   
+            margin: 0 5px;   
+            cursor: pointer;   
+            font-family: 'Creepster', cursive;   
+            transition: all 0.3s;   
+        }   
+
+        .music-player button:hover {   
+            background-color: #81c784;   
+            transform: scale(1.1);   
+        }   
+
+        /* Spooky Equalizer Styles */   
+        .equalizer {  
+            display: flex;
+    align-items: flex-end;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark background */
+    border: 2px solid var(--spooky-green); /* Spooky green border */
+    box-shadow: 0 0 20px var(--spooky-green); /* Glowing effect */
+}  
+
+.bar {
+    width: 5px;
+    margin: 0 1px;
+    background-color: var(--spooky-green); /* Spooky green color */
+    height: 5px; /* Base height */
+    transition: height 0.1s ease, background-color 0.3s ease; /* Smooth transition */
+    border-radius: 3px; /* Rounded edges */
+}
+
+
+
+        /* Responsive adjustments */   
+        @media only screen and (max-width: 480px) {   
+            .music-player {   
+                flex-direction: column;   
+                align-items: center;   
+            }   
+
+            .equalizer {   
+                margin-top: 10px;   
+            }   
+        }   
+
+        /* Fog Shader Styles */  
+        canvas {  
+            display: block;  
+        }  
+
+        /* Pumpkin Animation Overlay */  
+        #pumpkinScene {  
+            position: fixed;  
+            top: 0;  
+            left: 0;  
+            width: 100%;  
+            height: 100%;  
+            z-index: 2;  
+            pointer-events: none;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <!-- Fog Canvas -->  
+    <canvas id="fogCanvas"></canvas>  
+    <!-- Pumpkin Animation Scene -->  
+    <div id="pumpkinScene"></div>  
+
+    <div class="container">   
+        <div class="heading">   
+            <h1 id="mainTitle"></h1>   
+        </div>   
+        
+        <div class="dropdown">   
+            <label for="sortOrder">Summon Images: </label>   
+            <select id="sortOrder">   
+                <option value="newest">Fresh Nightmares</option>   
+                <option value="oldest">Ancient Terrors</option>   
+            </select>   
+        </div>   
+        
+        <div class="gallery" id="gallery">   
+            <!-- Images will be added dynamically using JavaScript -->   
+        </div>   
+    </div>   
+    <div class="footer">   
+        <p>&copy; 2023 Rodan's Haunted Nature Realm. Abandon all hope, ye who enter here. | Captured by <a href="#">The Spectral Rodan</a></p>   
+    </div>   
+
+    <!-- Modal Structure -->   
+    <div class="modal" id="modal">   
+        <div class="modal-content">   
+            <button class="close-btn" id="closeBtn">&times;</button>   
+            <img src="" alt="Nightmarish Nature Scene" id="fullImage">   
+        </div>   
+    </div>   
+
+    <!-- Spooky Nature Decorations -->   
+    <div class="decoration tree">🌳</div>   
+    <div class="decoration fog-emoji">🌫️</div>   
+    <div class="decoration moon">🌕</div>   
+    <div class="decoration owl">🦉</div>   
+
+    <!-- Music Player -->   
+    <div class="music-player">   
+        <button id="playPauseBtn">Play Eerie Sounds</button>   
+        <button id="stopBtn">Silence</button>   
+        <div class="equalizer">   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+            <div class="bar"></div>   
+        </div>   
+    </div>   
+
+    <!-- Audio Storage Section -->  
+    <div id="audioStorage" style="display: none;">  
+        <!-- Background Music -->  
+        <audio id="backgroundMusic" loop>  
+            <source src="NEONI - Darkside (Lyrics).mp3" type="audio/mpeg">  
+        </audio>  
+        <!-- Additional Audio Files -->  
+        <!-- Add more audio elements here as needed -->  
+    </div>  
+
+    <script>document.addEventListener("DOMContentLoaded", function () {  
+        // Three.js Setup for Fog Effect  
+        let fogScene, fogCamera, fogRenderer, fogGeometry, fogMaterial, fogMesh;  
+    
+        function initFog() {  
+            fogScene = new THREE.Scene();  
+            fogCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);  
+            fogRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('fogCanvas'), alpha: true });  
+            fogRenderer.setSize(window.innerWidth, window.innerHeight);  
+    
+            const fogTexture = new THREE.TextureLoader().load('https://i.imgur.com/8wR3p2k.png');  
+            fogMaterial = new THREE.MeshBasicMaterial({ map: fogTexture, transparent: true, opacity: 0.5 });  
+            fogGeometry = new THREE.PlaneGeometry(100, 100);  
+            fogMesh = new THREE.Mesh(fogGeometry, fogMaterial);  
+            fogMesh.position.z = -50;  
+            fogScene.add(fogMesh);  
+    
+            animateFog();  
+        }  
+    
+        function animateFog() {  
+            requestAnimationFrame(animateFog);  
+            fogMesh.position.x += 0.02;  
+            fogMesh.position.y += 0.01;  
+            fogRenderer.render(fogScene, fogCamera);  
+        }  
+    
+        // Three.js Setup for Pumpkin Animation  
+        let pumpkinScene, pumpkinCamera, pumpkinRenderer, pumpkin;  
+    
+        function initPumpkin() {  
+            pumpkinScene = new THREE.Scene();  
+            pumpkinCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);  
+            pumpkinRenderer = new THREE.WebGLRenderer({ alpha: true });  
+            pumpkinRenderer.setSize(window.innerWidth, window.innerHeight);  
+            document.getElementById('pumpkinScene').appendChild(pumpkinRenderer.domElement);  
+    
+            const ambientLight = new THREE.AmbientLight(0x220000, 0.1);  
+            pumpkinScene.add(ambientLight);  
+    
+            const pumpkinGeometry = new THREE.SphereGeometry(1, 32, 32);  
+            const pumpkinMaterial = new THREE.MeshPhongMaterial({  
+                color: 0x2a0000,  
+                specular: 0x111111,  
+                shininess: 50,  
+                emissive: 0x220000,  
+                emissiveIntensity: 0.7  
+            });  
+            pumpkin = new THREE.Mesh(pumpkinGeometry, pumpkinMaterial);  
+            pumpkinScene.add(pumpkin);  
+    
+            pumpkinCamera.position.z = 3;  
+    
+            animatePumpkin();  
+        }  
+    
+        function animatePumpkin() {  
+            requestAnimationFrame(animatePumpkin);  
+            pumpkin.rotation.y += 0.01;  
+            pumpkinRenderer.render(pumpkinScene, pumpkinCamera);  
+        }  
+    
+        initFog();  
+        initPumpkin();  
+    
+        const rawImageUrls = [  
+            "coverimage/1.jpg", "coverimage/3.jpg", "coverimage/5.jpg", "coverimage/6.jpg", "coverimage/8.jpg",  
+            "coverimage/9.jpg", "coverimage/10.jpg", "coverimage/11.jpg", "coverimage/12.jpg", "coverimage/13.jpg",  
+            "coverimage/14.jpg", "coverimage/15.jpg", "coverimage/16.jpg", "coverimage/17.jpg", "coverimage/18.jpg",  
+            "coverimage/19.jpg", "coverimage/20.jpg", "coverimage/21.jpg", "coverimage/22.jpg", "coverimage/23.jpg",  
+            "coverimage/24.jpg", "coverimage/25.jpg", "coverimage/26.jpg", "coverimage/27.jpg", "coverimage/28.jpg",  
+            "coverimage/29.jpg", "coverimage/30.jpg", "coverimage/31.jpg", "coverimage/32.jpg", "coverimage/33.jpg",  
+            "coverimage/34.jpg", "coverimage/35.jpg", "coverimage/36.jpg", "coverimage/37.jpg", "coverimage/38.jpg",  
+            "coverimage/39.jpg", "coverimage/40.jpg", "coverimage/41.jpg", "coverimage/42.jpg", "coverimage/43.jpg",  
+            "coverimage/44.jpg", "coverimage/45.jpg", "coverimage/46.jpg", "coverimage/47.jpg", "coverimage/48.jpg",  
+            "coverimage/49.jpg", "coverimage/50.jpg", "coverimage/51.jpg", "coverimage/52.jpg", "coverimage/53.jpg",  
+            "coverimage/54.jpg", "coverimage/55.jpg", "coverimage/56.jpg", "coverimage/57.jpg", "coverimage/58.jpg",  
+            "coverimage/59.jpg", "coverimage/60.jpg", "coverimage/61.jpg", "coverimage/62.jpg", "coverimage/63.jpg",  
+            "coverimage/64.jpg", "coverimage/65.jpg", "coverimage/66.jpg", "coverimage/67.jpg", "coverimage/68.jpg",  
+            "coverimage/69.jpg", "coverimage/70.jpg", "coverimage/71.jpg", "coverimage/72.jpg", "coverimage/73.jpg",  
+            "coverimage/74.jpg", "coverimage/75.jpg", "coverimage/76.jpg", "coverimage/77.jpg", "coverimage/78.jpg",  
+            "coverimage/79.jpg", "coverimage/80.jpg", "coverimage/81.jpg", "coverimage/82.jpg", "coverimage/83.jpg",  
+            "coverimage/84.jpg", "coverimage/85.jpg", "coverimage/86.jpg", "coverimage/87.jpg", "coverimage/88.jpg",  
+            "coverimage/89.jpg", "coverimage/90.jpg", "coverimage/91.jpg", "coverimage/92.jpg", "coverimage/93.jpg",  
+            "coverimage/94.jpg", "coverimage/95.jpg", "coverimage/96.jpg", "coverimage/97.jpg", "coverimage/98.jpg",  
+            "coverimage/99.jpg", "coverimage/100.jpg", "coverimage/101.jpg", "coverimage/102.jpg", "coverimage/103.jpg",  
+            "coverimage/104.jpg", "coverimage/105.jpg", "coverimage/106.jpg", "coverimage/107.jpg", "coverimage/108.jpg",  
+            "coverimage/109.jpg", "coverimage/110.jpg", "coverimage/111.jpg", "coverimage/112.jpg", "coverimage/113.jpg",  
+            "coverimage/115.jpg", "coverimage/116.jpg", "coverimage/117.jpg", "coverimage/118.jpg", "coverimage/119.jpg",  
+            "coverimage/120.jpg", "coverimage/121.jpg", "coverimage/122.jpg", "coverimage/123.jpg", "coverimage/124.jpg"  
+        ];  
+    
+        const coverImageUrls = [  
+            "1.jpg", "3.jpg", "5.jpg", "6.jpg", "8.jpg",  
+            "9.jpg", "10.jpg", "11.jpg", "12.jpg", "13.jpg",  
+            "14.jpg", "15.jpg", "16.jpg", "17.jpg", "18.jpg",  
+            "19.jpg", "20.jpg", "21.jpg", "22.jpg", "23.jpg",  
+            "24.jpg", "25.jpg", "26.jpg", "27.jpg", "28.jpg",  
+            "29.jpg", "30.jpg", "31.jpg", "32.jpg", "33.jpg",  
+            "34.jpg", "35.jpg", "36.jpg", "37.jpg", "38.jpg",  
+            "39.jpg", "40.jpg", "41.jpg", "42.jpg", "43.jpg",  
+            "44.jpg", "45.jpg", "46.jpg", "47.jpg", "48.jpg",  
+            "49.jpg", "50.jpg", "51.jpg", "52.jpg", "53.jpg",  
+            "54.jpg", "55.jpg", "56.jpg", "57.jpg", "58.jpg",  
+            "59.jpg", "60.jpg", "61.jpg", "62.jpg", "63.jpg",  
+            "64.jpg", "65.jpg", "66.jpg", "67.jpg", "68.jpg",  
+            "69.jpg", "70.jpg", "71.jpg", "72.jpg", "73.jpg",  
+            "74.jpg", "75.jpg", "76.jpg", "77.jpg", "78.jpg",  
+            "79.jpg", "80.jpg", "81.jpg", "82.jpg", "83.jpg",  
+            "84.jpg", "85.jpg", "86.jpg", "87.jpg", "88.jpg",  
+            "89.jpg", "90.jpg", "91.jpg", "92.jpg", "93.jpg",  
+            "94.jpg", "95.jpg", "96.jpg", "97.jpg", "98.jpg",  
+            "99.jpg", "100.jpg", "101.jpg", "102.jpg", "103.jpg",  
+            "104.jpg", "105.jpg", "106.jpg", "107.jpg", "108.jpg",  
+            "109.jpg", "110.jpg", "111.jpg", "112.jpg", "113.jpg",  
+            "115.jpg", "116.jpg", "117.jpg", "118.jpg", "119.jpg",  
+            "120.jpg", "121.jpg", "122.jpg", "123.jpg", "124.jpg"  
+        ];  
+    
+        const mainTitle = "Rodan's Haunted Nature Realm";  
+        document.getElementById("mainTitle").textContent = mainTitle;  
+    
+        const galleryContainer = document.getElementById("gallery");  
+        let currentImageIndex = 0;  
+        let currentImageType = 'cover';  
+    
+        function createGallery(coverImages, rawImages) {  
+            galleryContainer.innerHTML = "";  
+            
+            function createImageElement(url, type, index) {  
+                const imageBox = document.createElement("div");  
+                imageBox.className = "relative";  
+    
+                const img = document.createElement("img");  
+                img.src = url;  
+                img.alt = "Nightmarish Nature Scene";  
+                img.className = "w-full h-auto";  
+                img.addEventListener("click", function () {  
+                    openModal(url, type, index);  
+                });  
+    
+                const downloadBtn = document.createElement("a");  
+                downloadBtn.href = "#";  
+                downloadBtn.textContent = "Trap Soul";  
+                downloadBtn.className = "download-btn block text-center text-white mt-2";  
+                downloadBtn.addEventListener("click", function(e) {  
+                    e.preventDefault();  
+                    downloadImage(url);  
+                });  
+    
+                const toggleBtn = document.createElement("button");  
+                toggleBtn.textContent = type === 'cover' ? "View Raw" : "View Cover";  
+                toggleBtn.className = "toggle-btn absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded";  
+                toggleBtn.addEventListener("click", function() {  
+                    const otherType = type === 'cover' ? 'raw' : 'cover';  
+                    const otherUrl = otherType === 'cover' ? coverImages[index] : rawImages[index];  
+                    if (otherUrl) {  
+                        img.src = otherUrl;  
+                        toggleBtn.textContent = type === 'cover' ? "View Cover" : "View Raw";  
+                        type = otherType;  
+                    }  
+                });  
+    
+                imageBox.appendChild(img);  
+                imageBox.appendChild(downloadBtn);  
+                imageBox.appendChild(toggleBtn);  
+                return imageBox;  
+            }  
+    
+            coverImages.forEach((url, index) => {  
+                const imageBox = createImageElement(url, 'cover', index);  
+                galleryContainer.appendChild(imageBox);  
+            });  
+        }  
+    
+        function openModal(imageSrc, imageType, index) {  
+            const modal = document.getElementById("modal");  
+            const fullImage = document.getElementById("fullImage");  
+            const downloadLink = document.createElement("a");  
+            const toggleLink = document.createElement("a");  
+    
+            fullImage.src = imageSrc;  
+            downloadLink.href = "#";  
+            downloadLink.textContent = "Download";  
+            downloadLink.className = "download-btn text-white mr-2";  
+            downloadLink.onclick = function(e) {  
+                e.preventDefault();  
+                downloadImage(imageSrc);  
+            };  
+    
+            toggleLink.href = "#";  
+            toggleLink.textContent = imageType === 'cover' ? "View Raw" : "View Cover";  
+            toggleLink.className = "toggle-btn text-white ml-2";  
+            toggleLink.onclick = function(e) {  
+                e.preventDefault();  
+                const otherType = imageType === 'cover' ? 'raw' : 'cover';  
+                const otherUrl = otherType === 'cover' ? coverImageUrls[index] : rawImageUrls[index];  
+                if (otherUrl) {  
+                    fullImage.src = otherUrl;  
+                    imageType = otherType;  
+                    this.textContent = imageType === 'cover' ? "View Raw" : "View Cover";  
+                }  
+            };  
+    
+            const modalContent = document.querySelector(".modal-content");  
+            modalContent.appendChild(downloadLink);  
+            modalContent.appendChild(toggleLink);  
+    
+            modal.style.display = "flex";  
+        }  
+    
+        function downloadImage(url) {  
+            const link = document.createElement('a');  
+            link.href = url;  
+            link.download = url.split('/').pop();  
+            document.body.appendChild(link);  
+            link.click();  
+            document.body.removeChild(link);  
+        }  
+    
+        document.getElementById("closeBtn").addEventListener("click", function () {  
+            document.getElementById("modal").style.display = "none";  
+        });  
+    
+        document.getElementById("sortOrder").addEventListener("change", function (e) {  
+            const sortedCoverImages = [...coverImageUrls];  
+            const sortedRawImages = [...rawImageUrls];  
+            if (e.target.value === "newest") {  
+                sortedCoverImages.reverse();  
+                sortedRawImages.reverse();  
+            }  
+            createGallery(sortedCoverImages, sortedRawImages);  
+        });  
+    
+        // Initialize the gallery with the default sort order (newest)  
+        createGallery([...coverImageUrls].reverse(), [...rawImageUrls].reverse());  
+    
+        // Music Player and Equalizer  
+        const playPauseBtn = document.getElementById('playPauseBtn');  
+        const stopBtn = document.getElementById('stopBtn');  
+        const equalizer = document.querySelector('.equalizer');  
+        const bars = equalizer.querySelectorAll('.bar');  
+    
+        const backgroundMusic = document.getElementById('backgroundMusic');  
+    
+        let isPlaying = false;  
+    
+        playPauseBtn.addEventListener('click', function() {  
+            if (isPlaying) {  
+                backgroundMusic.pause();  
+                playPauseBtn.textContent = 'Play Eerie Sounds';  
+                stopEqualizer();  
+            } else {  
+                backgroundMusic.play();  
+                playPauseBtn.textContent = 'Pause Eerie Sounds';  
+                startEqualizer();  
+            }  
+            isPlaying = !isPlaying;  
+        });  
+    
+        stopBtn.addEventListener('click', function() {  
+            backgroundMusic.pause();  
+            backgroundMusic.currentTime = 0;  
+            playPauseBtn.textContent = 'Play Eerie Sounds';  
+            isPlaying = false;  
+            stopEqualizer();  
+        });  
+    
+        function startEqualizer() {  
+            animateEqualizer();  
+        }  
+    
+        function stopEqualizer() {  
+            bars.forEach(bar => bar.style.height = '5px');  
+        }  
+
+        function animateEqualizer() {  
+            if (isPlaying) {  
+                bars.forEach(bar => {  
+                    const height = Math.random() * 45 + 5;  
+                    bar.style.height = `${height}px`;  
+                });  
+                requestAnimationFrame(animateEqualizer);  
+            }  
+        }  
+
+        const audio = document.getElementById('backgroundMusic');
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const source = audioContext.createMediaElementSource(audio);
+const analyser = audioContext.createAnalyser();
+source.connect(analyser);
+analyser.connect(audioContext.destination);
+
+const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+function updateEqualizer() {
+    analyser.getByteFrequencyData(dataArray);
+    
+    // Loop through the bars and adjust their height based on frequency data
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach((bar, index) => {
+        bar.style.height = `${dataArray[index] / 5.2}px`; // Scale the height as needed
+    });
+
+    requestAnimationFrame(updateEqualizer);
+}
+
+// Call this function to start the equalizer
+updateEqualizer();
+
+    
+        // Window Resize Event  
+        window.addEventListener('resize', function () {  
+            fogCamera.aspect = window.innerWidth / window.innerHeight;  
+            fogCamera.updateProjectionMatrix();  
+            fogRenderer.setSize(window.innerWidth, window.innerHeight);  
+    
+            pumpkinCamera.aspect = window.innerWidth / window.innerHeight;  
+            pumpkinCamera.updateProjectionMatrix();  
+            pumpkinRenderer.setSize(window.innerWidth, window.innerHeight);  
+        });  
+    });      
+    
+    
+    function updateEqualizer() {
+    analyser.getByteFrequencyData(dataArray);
+    
+    bars.forEach((bar, index) => {
+        const height = dataArray[index] / 1; // Adjust the height
+        bar.style.height = `${height}px`;
+
+        // Create a pulsing effect
+        const pulse = height > 20 ? 1.2 : 1; // Scale up if height is above a threshold
+        bar.style.transform = `scaleY(${pulse})`;
+        bar.style.transition = `transform 0.1s ease`; // Smooth scaling
+    });
+
+    requestAnimationFrame(updateEqualizer);
+}
+    
+
+
+    
+
+// Call the createGhosts function in the init() function
+
+createGhosts();
+
+
+    </script>
+</body>   
+</html> 
