@@ -23,19 +23,6 @@
             90% { height: 100px; top: 110%; opacity: 1; }  
             100% { height: 100px; top: 110%; opacity: 0; }  
         }  
-<<<<<<< HEAD
-        #loadingText {
-    position: absolute;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 5vw; /* Use viewport width for responsiveness */
-    color: red; /* Default color */
-    text-align: center;
-    animation: pulse 1.5s infinite;
-    white-space: nowrap; /* Prevent text wrapping */
-}
-
         #clickAnimation {  
             position: absolute;  
             top: 20px;  
@@ -91,63 +78,6 @@
         <!-- Add more audio elements here as needed -->  
     </div>  
 
-=======
-        #clickAnimation {  
-            position: absolute;  
-            top: 20px;  
-            right: 20px;  
-            width: 60px;  
-            height: 60px;  
-            background-color: rgba(139, 0, 0, 0.7);  
-            border-radius: 50%;  
-            display: flex;  
-            align-items: center;  
-            justify-content: center;  
-            font-size: 30px;  
-            color: white;  
-            cursor: pointer;  
-            animation: pulse 1.5s infinite;  
-        }  
-        @keyframes pulse {  
-            0% { transform: scale(1); }  
-            50% { transform: scale(1.3); }  
-            100% { transform: scale(1); }  
-        }  
-        #jumpScare {  
-            position: fixed;  
-            top: 0;  
-            left: 0;  
-            width: 100%;  
-            height: 100%;  
-            background-image: url('https://i.imgur.com/4Yv9dIp.jpg');  
-            background-size: cover;  
-            background-position: center;  
-            display: none;  
-            z-index: 1000;  
-        }  
-    </style>  
-</head>  
-<body class="bg-black m-0 p-0 h-screen flex items-center justify-center">  
-    <div id="pumpkinScene" class="w-full h-full cursor-default"></div>  
-    <div id="loadingText" class="absolute bottom-5 text-5xl text-red-600 text-center animate-pulse"></div>  
-    <div id="clickAnimation">👆</div>  
-    <div id="jumpScare"></div>  
-
-    <!-- Audio Storage Section -->  
-    <div id="audioStorage" style="display: none;">  
-        <!-- Background Music -->  
-        <audio id="backgroundMusic" loop>  
-            <source src="path/to/your/background-music.mp3" type="audio/mpeg">  
-        </audio>  
-        <!-- Scream Sound -->  
-        <audio id="screamSound">  
-            <source src="path/to/your/scream-sound.mp3" type="audio/mpeg">  
-        </audio>  
-        <!-- Additional Audio Files -->  
-        <!-- Add more audio elements here as needed -->  
-    </div>  
-
->>>>>>> 99aec3d027dfbe2806665b8e5eaff729170ca033
     <script>  
         let scene, camera, renderer, pumpkin, smoke, mouth;  
         let isClickable = false;  
@@ -340,18 +270,10 @@
         let textIndex = 0;  
         function changeLoadingText() {  
             const loadingText = document.getElementById('loadingText');  
-<<<<<<< HEAD
-    loadingText.textContent = loadingTexts[textIndex];  
-    textIndex = (textIndex + 1) % loadingTexts.length;  
-    const screenWidth = window.innerWidth;  
-    loadingText.style.fontSize = `${Math.max(5, screenWidth / 100)}px`; // Adjust size based on screen width
-    loadingText.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;    
-=======
             loadingText.textContent = loadingTexts[textIndex];  
             textIndex = (textIndex + 1) % loadingTexts.length;  
             loadingText.style.fontSize = `${5 + Math.random() * 2}rem`;  
             loadingText.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;  
->>>>>>> 99aec3d027dfbe2806665b8e5eaff729170ca033
         }  
 
         setInterval(changeLoadingText, 3000);  
